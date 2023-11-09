@@ -186,14 +186,12 @@ class MainWindow(QWidget):
     def Reboot(self):
         # sqlRequest = "SELECT * FROM names"
         sqlRequest = """SELECT 
-            names.id, 
-            names.Author, 
-            names.Book,
-            names.Review
+            id, 
+            Author, 
+            Book,
+            Review
         FROM
-            book
-        INNER JOIN names
-            ON names.Review = names.id
+            names
             """
 
         con = sqlite3.connect("book.sqlite")
@@ -287,7 +285,6 @@ class windowAdd(QDialog):
             con.commit()
             cur.execute(sqlRequest, data)
             con.commit()
-            con.commit()
             con.close()
 
             self.lineEditName.clear()
@@ -345,10 +342,6 @@ class windowSettings(QDialog):
                                                         (?,?,?)"""
             with open("table.csv", encoding="utf8") as csvfile:
                 reader = csv.reader(csvfile)
-                # check = csvfile.read()
-                # print(check)
-                # csvfile.seek(0)
-                # if check:
                 cur.execute("DELETE FROM names WHERE id > 0")
                 con.commit()
                 for index, row in enumerate(reader):
