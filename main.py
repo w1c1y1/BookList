@@ -13,7 +13,7 @@ class MainWindow(QWidget):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.setWindowTitle("BookList")
-        self.resize(1185, 700)
+        self.resize(1920, 1080)
         self.initUI()
 
     def initUI(self):
@@ -61,11 +61,19 @@ class MainWindow(QWidget):
         btnDelete.setFixedSize(150, 35)
         btnDelete.move(0, 80)
 
+        btnLogin = QPushButton(frameMenu)
+        btnLogin.setText("Login")
+        btnLogin.setCursor(Qt.PointingHandCursor)
+        btnLogin.setFixedSize(150, 35)
+        btnLogin.move(0, 115)
+
         btnSettings = QPushButton(frameMenu)
         btnSettings.setText("Settings")
         btnSettings.setCursor(Qt.PointingHandCursor)
         btnSettings.setFixedSize(150, 35)
-        btnSettings.move(0, 115)
+        btnSettings.move(0, 150)
+
+
 
         # title
 
@@ -106,7 +114,7 @@ class MainWindow(QWidget):
 
         # Columns
 
-        NAMES_FOR_COLUMNS = ["ID", "Author", "Book", "Review"]
+        NAMES_FOR_COLUMNS = ["Student Name", "Author", "Book", "Review"]
 
         # table
 
@@ -124,7 +132,7 @@ class MainWindow(QWidget):
         self.table.verticalHeader().setDefaultSectionSize(35)
         self.table.setHorizontalHeaderLabels(NAMES_FOR_COLUMNS)
 
-        for i, width in enumerate((60, 225, 225, 500), start=0):
+        for i, width in enumerate((300, 325, 325, 1000), start=0):
             self.table.setColumnWidth(i, width)
 
         tableLayout = QVBoxLayout()
@@ -155,6 +163,7 @@ class MainWindow(QWidget):
         btnDelete.clicked.connect(self.Delete)
         btnSettings.clicked.connect(self.Settings)
         btnReboot.clicked.connect(self.Reboot)
+        btnLogin.clicked.connect(self.Login)
 
     # ------------------------------------------------
     # ----------------FUNCTIONS-----------------------
@@ -162,6 +171,9 @@ class MainWindow(QWidget):
 
     def Add(self):
         windowAdd(self).exec_()
+
+
+
 
     def Delete(self):
         selected_string = self.table.selectedItems()
@@ -175,6 +187,20 @@ class MainWindow(QWidget):
             con.close()
             self.table.removeRow(id)
             self.table.clearSelection()
+            sqlRequest = """SELECT 
+                        id, 
+                        Author, 
+                        Book,
+                        Review
+                    FROM
+                        names
+                        """
+
+            con = sqlite3.connect("book.sqlite")
+            cur = con.cursor()
+            cur.execute(sqlRequest)
+            returned_data = cur.fetchall()
+            con.close()
         else:
             QMessageBox.critical(self, "Delete book", "Select a row", QMessageBox.Ok)
 
@@ -212,6 +238,10 @@ class MainWindow(QWidget):
                 row += 1
         else:
             QMessageBox.critical(self, "Reboot", "There is no data in db", QMessageBox.Ok)
+
+
+    def Login(self):
+        windowLogin(self).exec_()
 
 
 class windowAdd(QDialog):
@@ -282,7 +312,7 @@ class windowAdd(QDialog):
                            Book TEXT,
                            Review TEXT);
                         """)
-            con.commit()
+
             cur.execute(sqlRequest, data)
             con.commit()
             con.close()
@@ -292,6 +322,7 @@ class windowAdd(QDialog):
             self.lineEditReview.clear()
 
             self.lineEditName.setFocus()
+            self.close()
 
 
 
@@ -389,6 +420,108 @@ class windowSettings(QDialog):
             QMessageBox.critical(self, "Export table",
                                  "The export was not successful.",
                                  QMessageBox.Ok)
+
+
+class windowLogin(QDialog):
+    def __init__(self, parents=None):
+        super(windowLogin, self).__init__()
+        self.setWindowTitle("Log In")
+        self.setFixedSize(320, 230)
+        self.initUI()
+
+    def initUI(self):
+        btnTeacher = QPushButton("As Teacher", self)
+        btnTeacher.setCursor(Qt.PointingHandCursor)
+        btnTeacher.move(30, 90)
+        btnTeacher.clicked.connect(self.LogInAsTeacher)
+
+        btnStudent = QPushButton("As Student", self)
+        btnStudent.setCursor(Qt.PointingHandCursor)
+        btnStudent.move(185, 90)
+        btnStudent.clicked.connect(self.LogInAsStudent)
+
+
+    def LogInAsTeacher(self):
+        TeacherLogin(self).exec_()
+
+    def LogInAsStudent(self):
+        StudentLogin(self).exec_()
+
+
+class TeacherLogin(QDialog):
+    def __init__(self, parents=None):
+        super(TeacherLogin, self).__init__()
+        self.setWindowTitle("Log In")
+        self.setFixedSize(320, 230)
+        self.initUI()
+
+    def initUI(self):
+        labelName = QLabel("Login", self.information)
+        labelName.move(15, 15)
+        self.lineEditName = QLineEdit(self.information)
+        self.lineEditName.setFixedSize(270, 30)
+        self.lineEditName.setFocus()
+        self.lineEditName.move(15, 30)
+
+        labelNumber = QLabel("Password", self.information)
+        labelNumber.move(15, 65)
+        self.lineEditBook = QLineEdit(self.information)
+        self.lineEditBook.setFixedSize(270, 30)
+        self.lineEditBook.setFocus()
+        self.lineEditBook.move(15, 80)
+
+        btnAccept = QPushButton("Accept", self)
+        btnAccept.setCursor(Qt.PointingHandCursor)
+        btnAccept.move(30, 180)
+        btnAccept.clicked.connect(self.Accept)
+
+        btnCancel = QPushButton("Cancel", self)
+        btnCancel.setCursor(Qt.PointingHandCursor)
+        btnCancel.move(185, 180)
+        btnCancel.clicked.connect(self.close)
+
+
+    def Accept(self):
+        name = " ".join(self.lineEditName.text().split()).title()
+        book = " ".join(self.lineEditBook.text().split()).title()
+        review = " ".join(self.lineEditReview.text().split()).title()
+
+        if not name:
+            self.lineEditName.setFocus()
+        elif not book:
+            self.lineEditBook.setFocus()
+        elif not review:
+            self.lineEditReview.setFocus()
+        else:
+            con = sqlite3.connect("book.sqlite")
+            cur = con.cursor()
+
+            data = [name, book, review]
+            sqlRequest = """INSERT INTO names
+                            (Author, Book, Review)
+                            VALUES
+                            (?,?,?)"""
+            cur.execute("""CREATE TABLE IF NOT EXISTS names(
+                           id INTEGER PRIMARY KEY,
+                           Author TEXT,
+                           Book TEXT,
+                           Review TEXT);
+                        """)
+
+            cur.execute(sqlRequest, data)
+            con.commit()
+            con.close()
+
+            self.lineEditName.clear()
+            self.lineEditBook.clear()
+            self.lineEditReview.clear()
+
+            self.lineEditName.setFocus()
+            self.close()
+
+
+class StudentLogin(QDialog):
+    pass
 
 
 def except_hook(cls, exception, traceback):
