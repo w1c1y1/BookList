@@ -62,16 +62,19 @@ class windowAdd(QDialog):
         elif not review:
             self.lineEditReview.setFocus()
         else:
+            con = sqlite3.connect("login_user.sqlite")
+            cur = con.cursor()
+            student_name = cur.execute('SELECT * FROM login_user').fetchall()[0][0]
             con = sqlite3.connect("book.sqlite")
             cur = con.cursor()
 
-            data = [name, book, review]
+            data = [student_name, name, book, review]
             sqlRequest = """INSERT INTO names
-                            (Author, Book, Review)
+                            (id, Author, Book, Review)
                             VALUES
-                            (?,?,?)"""
+                            (?,?,?,?)"""
             cur.execute("""CREATE TABLE IF NOT EXISTS names(
-                           id INTEGER PRIMARY KEY,
+                           id TEXT,
                            Author TEXT,
                            Book TEXT,
                            Review TEXT);""")

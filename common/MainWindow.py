@@ -54,6 +54,7 @@ class MainWindow(QWidget):
 
         # buttons for menu
 
+
         btnAdd = QPushButton(frameMenu)
         btnAdd.setText("Add book")
         btnAdd.setCursor(Qt.PointingHandCursor)
@@ -116,6 +117,7 @@ class MainWindow(QWidget):
         btnReboot.setIconSize(QSize(30, 30))
         btnReboot.setCursor(Qt.PointingHandCursor)
         btnReboot.setFixedWidth(40)
+
 
         titleFrame = QHBoxLayout()
         titleFrame.addWidget(titleText, Qt.AlignCenter)
@@ -259,3 +261,5 @@ class MainWindow(QWidget):
 
     def SignUp(self):
         windowSignUp.windowSignUp(self).exec_()
+
+
