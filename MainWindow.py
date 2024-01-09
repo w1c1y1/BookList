@@ -176,6 +176,7 @@ class MainWindow(QWidget):
         btnSettings.clicked.connect(self.Settings)
         btnReboot.clicked.connect(self.Reboot)
         btnLogin.clicked.connect(self.Login)
+        btnSignUp.clicked.connect(self.SignUp)
 
     # ------------------------------------------------
     # ----------------FUNCTIONS-----------------------
@@ -256,5 +257,5 @@ class MainWindow(QWidget):
         windowLogin.windowLogin(self).exec_()
 
 
-    def NewUser(self):
+    def SignUp(self):
         windowSignUp.windowSignUp(self).exec_()

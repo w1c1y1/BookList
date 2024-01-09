@@ -54,30 +54,32 @@ class windowLogin(QDialog):
 
         elif not Password:
             self.lineEditPassword.setFocus()
-            QMessageBox.critical(self, "Введите логин", QMessageBox.Ok)
+            QMessageBox.critical(self, "Введите пароль", QMessageBox.Ok)
         else:
-            con = sqlite3.connect("users_db.sqlite")
+            con = sqlite3.connect("users.sqlite")
             cur = con.cursor()
 
             data = [Login, Password]
+            info = cur.execute('SELECT * FROM users WHERE (Login, Password) VALUES (?,?)', (data,))
+            if info.fetchone() is None:
+                QMessageBox.critical(self, "Неверно введено имя пользователя или пароль", QMessageBox.Ok)
+            else:
+                QMessageBox.information(self, 'Вход выполнен успешно')
+
+
+            data = [Login, Password]
             sqlRequest = """INSERT INTO names
-                            (Author, Book, Review)
+                            (Login, Password)
                             VALUES
-                            (?,?,?)"""
-            cur.execute("""CREATE TABLE IF NOT EXISTS names(
-                           id INTEGER PRIMARY KEY,
-                           Author TEXT,
-                           Book TEXT,
-                           Review TEXT);
-                        """)
+                            (?,?)"""
 
             cur.execute(sqlRequest, data)
             con.commit()
             con.close()
 
-            self.lineEditName.clear()
-            self.lineEditBook.clear()
-            self.lineEditReview.clear()
+            self.lineEditLogin.clear()
+            self.lineEditPassword.clear()
+            self.lineEditRepeatPassword.clear()
 
-            self.lineEditName.setFocus()
+            self.lineEditLogin.setFocus()
             self.close()
