@@ -38,6 +38,7 @@ class windowLogin(QDialog):
         btnAccept.setCursor(Qt.PointingHandCursor)
         btnAccept.move(30, 180)
         btnAccept.clicked.connect(self.Accept)
+        btnAccept.clicked.connect(self.close)
 
         btnCancel = QPushButton("Cancel", self)
         btnCancel.setCursor(Qt.PointingHandCursor)
@@ -50,36 +51,57 @@ class windowLogin(QDialog):
 
         if not Login:
             self.lineEditLogin.setFocus()
-            QMessageBox.critical(self, "Введите логин", QMessageBox.Ok)
+            msgBox = QMessageBox()
+            msgBox.setIcon(QMessageBox.Information)
+            msgBox.setText("Ошибка входа")
+            msgBox.setWindowTitle("Вы не ввели логин")
+            msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
 
+            msgBox.exec()
         elif not Password:
             self.lineEditPassword.setFocus()
-            QMessageBox.critical(self, "Введите пароль", QMessageBox.Ok)
+            msgBox = QMessageBox()
+            msgBox.setIcon(QMessageBox.Information)
+            msgBox.setText("Ошибка входа")
+            msgBox.setWindowTitle("Вы не ввели пароль")
+            msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+
+            msgBox.exec()
         else:
             con = sqlite3.connect("users.sqlite")
             cur = con.cursor()
 
             data = [Login, Password]
-            info = cur.execute('SELECT * FROM users WHERE (Login, Password) VALUES (?,?)', (data,))
-            if info.fetchone() is None:
-                QMessageBox.critical(self, "Неверно введено имя пользователя или пароль", QMessageBox.Ok)
+            info = cur.execute('SELECT * FROM users WHERE Login = ? and Password = ?', (data[0], data[1],))
+            print(info.fetchall())
+            if not info.fetchall():
+                msgBox = QMessageBox()
+                msgBox.setIcon(QMessageBox.Information)
+                msgBox.setText("Ошибка входа")
+                msgBox.setWindowTitle("Такого пользователя не существует")
+                msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+
+                msgBox.exec()
             else:
-                QMessageBox.information(self, 'Вход выполнен успешно')
+                msgBox = QMessageBox()
+                msgBox.setIcon(QMessageBox.Information)
+                msgBox.setText("Вход выполнен успешно!")
+                msgBox.setWindowTitle("Поздравляем!")
+                msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
 
-
-            data = [Login, Password]
-            sqlRequest = """INSERT INTO names
-                            (Login, Password)
-                            VALUES
-                            (?,?)"""
-
-            cur.execute(sqlRequest, data)
-            con.commit()
-            con.close()
+                msgBox.exec()
+                data = [Login]
+                con = sqlite3.connect("login_user.sqlite")
+                cur = con.cursor()
+                cur.execute("""DELETE FROM login_user""")
+                cur.execute("""CREATE TABLE IF NOT EXISTS login_user(name TEXT)""")
+                sqlRequest = """INSERT INTO login_user(name) VALUES (?)"""
+                cur.execute(sqlRequest, data)
+                con.commit()
+                con.close()
 
             self.lineEditLogin.clear()
             self.lineEditPassword.clear()
-            self.lineEditRepeatPassword.clear()
 
             self.lineEditLogin.setFocus()
             self.close()

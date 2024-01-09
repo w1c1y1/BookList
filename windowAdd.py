@@ -43,6 +43,7 @@ class windowAdd(QDialog):
         btnAccept.setCursor(Qt.PointingHandCursor)
         btnAccept.move(30, 180)
         btnAccept.clicked.connect(self.Accept)
+        btnAccept.clicked.connect(self.close)
 
         btnCancel = QPushButton("Cancel", self)
         btnCancel.setCursor(Qt.PointingHandCursor)
@@ -73,12 +74,12 @@ class windowAdd(QDialog):
                            id INTEGER PRIMARY KEY,
                            Author TEXT,
                            Book TEXT,
-                           Review TEXT);
-                        """)
+                           Review TEXT);""")
 
             cur.execute(sqlRequest, data)
             con.commit()
             con.close()
+
 
             self.lineEditName.clear()
             self.lineEditBook.clear()
@@ -86,3 +87,5 @@ class windowAdd(QDialog):
 
             self.lineEditName.setFocus()
             self.close()
+
+

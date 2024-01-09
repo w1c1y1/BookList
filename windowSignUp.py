@@ -39,12 +39,13 @@ class windowSignUp(QDialog):
         labelUnit.move(15, 120)
         self.lineEditRepeatedPassword = QLineEdit(self.information)
         self.lineEditRepeatedPassword.setFixedSize(270, 30)
-        self.lineEditRepiatedPassword.move(15, 135)
+        self.lineEditRepeatedPassword.move(15, 135)
 
         btnAccept = QPushButton("Accept", self)
         btnAccept.setCursor(Qt.PointingHandCursor)
         btnAccept.move(30, 180)
         btnAccept.clicked.connect(self.Accept)
+        btnAccept.clicked.connect(self.close)
 
         btnCancel = QPushButton("Cancel", self)
         btnCancel.setCursor(Qt.PointingHandCursor)
@@ -56,40 +57,62 @@ class windowSignUp(QDialog):
         Password = " ".join(self.lineEditPassword.text().split()).title()
         RepeatedPassword = " ".join(self.lineEditRepeatedPassword.text().split()).title()
 
-        con = sqlite3.connect("users_db.sqlite")
-        cur = con.cursor()
-        check_data = [Login]
+        data = [Login]
 
-        def check(Login: str, Password: str):
-            cur.execute("SELECT * FROM users WHERE Login=Login AND Password=Password")
-            return cur.fetchone()
+        con = sqlite3.connect("users.sqlite")
+        cur = con.cursor()
+        info = cur.execute('SELECT * FROM users WHERE Login = ?', (data[0],))
+
 
         if not Login:
             self.lineEditLogin.setFocus()
-            QMessageBox.critical(self, "Введите логин", QMessageBox.Ok)
+            msgBox = QMessageBox()
+            msgBox.setIcon(QMessageBox.Information)
+            msgBox.setText("Ошибка регистрации")
+            msgBox.setWindowTitle("Вы не ввели логин")
+            msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+
+            msgBox.exec()
         elif not Password:
             self.lineEditPassword.setFocus()
-            QMessageBox.critical(self, "Введите пароль", QMessageBox.Ok)
+            msgBox = QMessageBox()
+            msgBox.setIcon(QMessageBox.Information)
+            msgBox.setText("Ошибка регистрации")
+            msgBox.setWindowTitle("Вы не ввели пароль")
+            msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+
+            msgBox.exec()
         elif not RepeatedPassword:
-            self.lineRepeatedPassword.setFocus()
-            QMessageBox.critical(self, "Подтвердите пароль", QMessageBox.Ok)
+            self.lineEditRepeatedPassword.setFocus()
+            msgBox = QMessageBox()
+            msgBox.setIcon(QMessageBox.Information)
+            msgBox.setText("Ошибка регистарции")
+            msgBox.setWindowTitle("Вы не ввели пароль повторно")
+            msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+
+            msgBox.exec()
         elif Password != RepeatedPassword:
-            self.lineEditRepeatedPassword()
-            QMessageBox.critical(self, "Пароли не совпадают", QMessageBox.Ok)
-        elif check(check_data):
-            self.lineEditLogin.setFocus()
-            QMessageBox.critical(self, "Такой логин уже существует", QMessageBox.Ok)
+            self.lineEditRepeatedPassword.setFocus()
+            msgBox = QMessageBox()
+            msgBox.setIcon(QMessageBox.Information)
+            msgBox.setText("Ошибка регистрации")
+            msgBox.setWindowTitle("Введенные пароли не совпадают")
+            msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+
+            msgBox.exec()
         else:
 
+            con = sqlite3.connect("users.sqlite")
+            cur = con.cursor()
             data = [Login, Password]
+            cur.execute("""CREATE TABLE IF NOT EXISTS users(
+                                       Login TEXT,
+                                       Password TEXT)""")
             sqlRequest = """INSERT INTO users
                             (Login, Password)
                             VALUES
-                            (?,?)"""
-            cur.execute("""CREATE TABLE IF NOT EXISTS names(
-                           Login TEXT UNIQUE,
-                           Password TEXT,);
-                        """)
+                            (?, ?)"""
+
 
             cur.execute(sqlRequest, data)
             con.commit()

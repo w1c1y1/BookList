@@ -167,6 +167,7 @@ class MainWindow(QWidget):
 
         self.setLayout(finalLayout)
 
+        self.Reboot()
         # --------------------------------------------
         # ---------------CONNECTS---------------------
         # --------------------------------------------
@@ -184,6 +185,8 @@ class MainWindow(QWidget):
 
     def Add(self):
         windowAdd.windowAdd(self).exec_()
+        self.Reboot()
+
 
 
 
@@ -249,9 +252,6 @@ class MainWindow(QWidget):
                 self.table.setItem(row, 2, QTableWidgetItem(str(i[2])))
                 self.table.setItem(row, 3, QTableWidgetItem(str(i[3])))
                 row += 1
-        else:
-            QMessageBox.critical(self, "Reboot", "There is no data in db", QMessageBox.Ok)
-
 
     def Login(self):
         windowLogin.windowLogin(self).exec_()
