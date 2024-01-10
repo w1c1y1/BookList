@@ -1,14 +1,10 @@
-from PyQt5.QtGui import QPalette, QColor, QBrush, QIcon, QRegularExpressionValidator, QIntValidator, QPixmap
-from PyQt5.QtWidgets import QWidget, QFrame, QApplication, QGridLayout, QLabel, QPushButton, QVBoxLayout, \
-    QTableWidget, QAbstractItemView, QHBoxLayout, QMessageBox, QTableWidgetItem, QDialog, QGroupBox, QLineEdit, \
-    QComboBox
-from PyQt5.QtCore import Qt, QSize
-import sys
+from PyQt5.QtWidgets import QLabel, QPushButton, QMessageBox, QDialog, QGroupBox, QLineEdit
+from PyQt5.QtCore import Qt
 import sqlite3
-import csv
+import os
 
-
-
+relative_users_path = "database/users.sqlite"
+absolute_users_path = os.path.abspath(relative_users_path)
 class windowSignUp(QDialog):
     def __init__(self, parents=None):
         super(windowSignUp, self).__init__()
@@ -59,10 +55,9 @@ class windowSignUp(QDialog):
 
         data = [Login]
 
-        con = sqlite3.connect("users.sqlite")
+        con = sqlite3.connect(absolute_users_path)
         cur = con.cursor()
         info = cur.execute('SELECT * FROM users WHERE Login = ?', (Login,))
-
 
         if not Login:
             self.lineEditLogin.setFocus()
@@ -102,7 +97,7 @@ class windowSignUp(QDialog):
             msgBox.exec()
         else:
 
-            con = sqlite3.connect("users.sqlite")
+            con = sqlite3.connect(absolute_users_path)
             cur = con.cursor()
             data = [Login, Password]
             cur.execute("""CREATE TABLE IF NOT EXISTS users(
@@ -112,7 +107,6 @@ class windowSignUp(QDialog):
                             (Login, Password)
                             VALUES
                             (?, ?)"""
-
 
             cur.execute(sqlRequest, data)
             con.commit()

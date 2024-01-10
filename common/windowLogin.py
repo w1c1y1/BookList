@@ -1,12 +1,12 @@
-from PyQt5.QtGui import QPalette, QColor, QBrush, QIcon, QRegularExpressionValidator, QIntValidator, QPixmap
-from PyQt5.QtWidgets import QWidget, QFrame, QApplication, QGridLayout, QLabel, QPushButton, QVBoxLayout, \
-    QTableWidget, QAbstractItemView, QHBoxLayout, QMessageBox, QTableWidgetItem, QDialog, QGroupBox, QLineEdit, \
-    QComboBox
-from PyQt5.QtCore import Qt, QSize
-import sys
+from PyQt5.QtWidgets import QLabel, QPushButton, QMessageBox, QDialog, QGroupBox, QLineEdit
+from PyQt5.QtCore import Qt
 import sqlite3
-import csv
+import os
 
+relative_users_path = "database/users.sqlite"
+absolute_users_path = os.path.abspath(relative_users_path)
+relative_login_path = "database/login_user.sqlite"
+absolute_login_path = os.path.abspath(relative_login_path)
 class windowLogin(QDialog):
     def __init__(self, parents=None):
         super(windowLogin, self).__init__()
@@ -68,7 +68,7 @@ class windowLogin(QDialog):
 
             msgBox.exec()
         else:
-            con = sqlite3.connect("users.sqlite")
+            con = sqlite3.connect(absolute_users_path)
             cur = con.cursor()
 
             data = [Login, Password]
@@ -89,7 +89,7 @@ class windowLogin(QDialog):
                 msgBox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
 
                 msgBox.exec()
-                con = sqlite3.connect("login_user.sqlite")
+                con = sqlite3.connect(absolute_login_path)
                 cur = con.cursor()
                 cur.execute("""DELETE FROM login_user""")
                 cur.execute("""CREATE TABLE IF NOT EXISTS login_user(name TEXT);""")

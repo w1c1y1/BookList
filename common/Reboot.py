@@ -1,20 +1,16 @@
-import sys
 import sqlite3
 import csv
 import windowAdd
 import windowSignUp
 import windowSettings
 import windowLogin
+import os
+from PyQt5.QtWidgets import QTableWidgetItem
 
-
-from PyQt5.QtGui import QPalette, QColor, QBrush, QIcon, QRegularExpressionValidator, QIntValidator, QPixmap
-from PyQt5.QtWidgets import QWidget, QFrame, QApplication, QGridLayout, QLabel, QPushButton, QVBoxLayout, \
-    QTableWidget, QAbstractItemView, QHBoxLayout, QMessageBox, QTableWidgetItem, QDialog, QGroupBox, QLineEdit, \
-    QComboBox
-from PyQt5.QtCore import Qt, QSize
-
-
+relative_book_path = "database/book.sqlite"
+absolute_book_path = os.path.abspath(relative_book_path)
 class Reboot:
+    def __init__(self):
         sqlRequest = """SELECT 
             id, 
             Author, 
@@ -24,7 +20,7 @@ class Reboot:
             names
             """
 
-        con = sqlite3.connect("book.sqlite")
+        con = sqlite3.connect(absolute_book_path)
         cur = con.cursor()
         cur.execute(sqlRequest)
         returned_data = cur.fetchall()

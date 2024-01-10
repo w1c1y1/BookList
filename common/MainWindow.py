@@ -1,21 +1,16 @@
-import sys
 import sqlite3
-import csv
-import windowAdd
-import windowSignUp
-import windowSettings
-import windowLogin
-
-
-from PyQt5.QtGui import QPalette, QColor, QBrush, QIcon, QRegularExpressionValidator, QIntValidator, QPixmap
-from PyQt5.QtWidgets import QWidget, QFrame, QApplication, QGridLayout, QLabel, QPushButton, QVBoxLayout, \
-    QTableWidget, QAbstractItemView, QHBoxLayout, QMessageBox, QTableWidgetItem, QDialog, QGroupBox, QLineEdit, \
-    QComboBox
+from common import windowAdd, windowSignUp, windowSettings, windowLogin
+from PyQt5.QtGui import QPalette, QColor, QBrush, QIcon
+from PyQt5.QtWidgets import QWidget, QFrame, QGridLayout, QLabel, QPushButton, QVBoxLayout, \
+    QTableWidget, QAbstractItemView, QHBoxLayout, QMessageBox, QTableWidgetItem
 from PyQt5.QtCore import Qt, QSize
+import os
 
 
-
+relative_book_path = "database/book.sqlite"
+absolute_book_path = os.path.abspath(relative_book_path)
 class MainWindow(QWidget):
+
     def __init__(self):
         super(MainWindow, self).__init__()
         self.setWindowTitle("BookList")
@@ -54,13 +49,11 @@ class MainWindow(QWidget):
 
         # buttons for menu
 
-
         btnAdd = QPushButton(frameMenu)
         btnAdd.setText("Add book")
         btnAdd.setCursor(Qt.PointingHandCursor)
         btnAdd.setFixedSize(150, 35)
         btnAdd.move(0, 45)
-
 
         btnDelete = QPushButton(frameMenu)
         btnDelete.setText("Delete book")
@@ -85,8 +78,6 @@ class MainWindow(QWidget):
         btnSettings.setCursor(Qt.PointingHandCursor)
         btnSettings.setFixedSize(150, 35)
         btnSettings.move(0, 185)
-
-
 
         # title
 
@@ -113,11 +104,12 @@ class MainWindow(QWidget):
         titleText.setPalette(palText)
 
         btnReboot = QPushButton()
-        btnReboot.setIcon(QIcon("reboot_icon.png"))
+        relative_reboot_path = "assets/reboot_icon.png"
+        absolute_reboot_path = os.path.abspath(relative_reboot_path)
+        btnReboot.setIcon(QIcon(absolute_reboot_path))
         btnReboot.setIconSize(QSize(30, 30))
         btnReboot.setCursor(Qt.PointingHandCursor)
         btnReboot.setFixedWidth(40)
-
 
         titleFrame = QHBoxLayout()
         titleFrame.addWidget(titleText, Qt.AlignCenter)
@@ -168,7 +160,6 @@ class MainWindow(QWidget):
         finalLayout.setContentsMargins(0, 0, 0, 0)
 
         self.setLayout(finalLayout)
-
         self.Reboot()
         # --------------------------------------------
         # ---------------CONNECTS---------------------
@@ -189,16 +180,12 @@ class MainWindow(QWidget):
         windowAdd.windowAdd(self).exec_()
         self.Reboot()
 
-
-
-
-
     def Delete(self):
         selected_string = self.table.selectedItems()
         if selected_string:
             id = selected_string[0].row()
             id_for_db = self.table.item(id, 0).text()
-            con = sqlite3.connect("book.sqlite")
+            con = sqlite3.connect(absolute_book_path)
             cur = con.cursor()
             cur.execute("DELETE FROM names WHERE id = ?", (id_for_db,))
             con.commit()
@@ -214,7 +201,7 @@ class MainWindow(QWidget):
                         names
                         """
 
-            con = sqlite3.connect("book.sqlite")
+            con = sqlite3.connect(absolute_book_path)
             cur = con.cursor()
             cur.execute(sqlRequest)
             returned_data = cur.fetchall()
@@ -225,10 +212,7 @@ class MainWindow(QWidget):
     def Settings(self):
         windowSettings.windowSettings(self).exec_()
 
-
-
     def Reboot(self):
-        # sqlRequest = "SELECT * FROM names"
         sqlRequest = """SELECT 
             id, 
             Author, 
@@ -238,7 +222,7 @@ class MainWindow(QWidget):
             names
             """
 
-        con = sqlite3.connect("book.sqlite")
+        con = sqlite3.connect(absolute_book_path)
         cur = con.cursor()
         cur.execute(sqlRequest)
         returned_data = cur.fetchall()
@@ -258,8 +242,5 @@ class MainWindow(QWidget):
     def Login(self):
         windowLogin.windowLogin(self).exec_()
 
-
     def SignUp(self):
         windowSignUp.windowSignUp(self).exec_()
-
-

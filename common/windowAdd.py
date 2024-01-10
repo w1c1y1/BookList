@@ -1,12 +1,15 @@
-from PyQt5.QtGui import QPalette, QColor, QBrush, QIcon, QRegularExpressionValidator, QIntValidator, QPixmap
-from PyQt5.QtWidgets import QWidget, QFrame, QApplication, QGridLayout, QLabel, QPushButton, QVBoxLayout, \
-    QTableWidget, QAbstractItemView, QHBoxLayout, QMessageBox, QTableWidgetItem, QDialog, QGroupBox, QLineEdit, \
-    QComboBox
-from PyQt5.QtCore import Qt, QSize
-import sys
+from PyQt5.QtWidgets import QLabel, QPushButton, QDialog, QGroupBox, QLineEdit
+from PyQt5.QtCore import Qt
 import sqlite3
-import csv
+import os
 
+
+relative_users_path = "database/users.sqlite"
+absolute_users_path = os.path.abspath(relative_users_path)
+relative_login_path = "database/login_user.sqlite"
+absolute_login_path = os.path.abspath(relative_login_path)
+relative_book_path = "database/book.sqlite"
+absolute_book_path = os.path.abspath(relative_book_path)
 class windowAdd(QDialog):
     def __init__(self, parents=None):
         super(windowAdd, self).__init__()
@@ -62,10 +65,10 @@ class windowAdd(QDialog):
         elif not review:
             self.lineEditReview.setFocus()
         else:
-            con = sqlite3.connect("login_user.sqlite")
+            con = sqlite3.connect(absolute_login_path)
             cur = con.cursor()
             student_name = cur.execute('SELECT * FROM login_user').fetchall()[0][0]
-            con = sqlite3.connect("book.sqlite")
+            con = sqlite3.connect(absolute_book_path)
             cur = con.cursor()
 
             data = [student_name, name, book, review]

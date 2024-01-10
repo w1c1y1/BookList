@@ -1,12 +1,12 @@
-from PyQt5.QtGui import QPalette, QColor, QBrush, QIcon, QRegularExpressionValidator, QIntValidator, QPixmap
-from PyQt5.QtWidgets import QWidget, QFrame, QApplication, QGridLayout, QLabel, QPushButton, QVBoxLayout, \
-    QTableWidget, QAbstractItemView, QHBoxLayout, QMessageBox, QTableWidgetItem, QDialog, QGroupBox, QLineEdit, \
-    QComboBox
-from PyQt5.QtCore import Qt, QSize
-import sys
+from PyQt5.QtGui import QPalette, QColor
+from PyQt5.QtWidgets import QFrame, QPushButton, QMessageBox, QDialog
+from PyQt5.QtCore import Qt
 import sqlite3
 import csv
+import os
 
+relative_book_path = "database/book.sqlite"
+absolute_book_path = os.path.abspath(relative_book_path)
 
 class windowSettings(QDialog):
     def __init__(self, parents=None):
@@ -46,7 +46,7 @@ class windowSettings(QDialog):
 
     def ImportTable(self):
         try:
-            con = sqlite3.connect("book.sqlite")
+            con = sqlite3.connect(absolute_book_path)
             cur = con.cursor()
             sqlRequest = """INSERT INTO names
                                                         (Author, Book, Review)
@@ -70,10 +70,9 @@ class windowSettings(QDialog):
                                  "Try to check the availability of the table.",
                                  QMessageBox.Ok)
 
-
     def ExportTable(self):
         try:
-            con = sqlite3.connect("book.sqlite")
+            con = sqlite3.connect(absolute_book_path)
             cur = con.cursor()
             sqlRequest = """SELECT Author, Book, Review
                             FROM names"""
